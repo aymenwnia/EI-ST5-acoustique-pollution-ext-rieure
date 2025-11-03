@@ -46,20 +46,20 @@ def compute_alpha(omega, material):
     #c_0 = 340.0
     
     # melamine foam 
-    #phi = 0.99  # porosity
-    #gamma_p = 7.0 / 5.0
-    #sigma = 14000.0  # resitivity
-    #rho_0 = 1.2
-    #alpha_h = 1.02  # tortuosity
-    #c_0 = 340.0
+    phi = 0.99  # porosity
+    gamma_p = 7.0 / 5.0
+    sigma = 14000.0  # resitivity
+    rho_0 = 1.2
+    alpha_h = 1.02  # tortuosity
+    c_0 = 340.0
     
     # laine de verre (source : https://backend.orbit.dtu.dk/ws/portalfiles/portal/337029887/ForumAcusticum_Compilation_1.pdf)
-    phi = 0.95  # porosity
-    gamma_p = 7.0 / 5.0
-    sigma = 8.0e4  # resitivity
-    rho_0 = 1.2
-    alpha_h = 1.2  # tortuosity
-    c_0 = 340.0
+    # phi = 0.95  # porosity
+    # gamma_p = 7.0 / 5.0
+    # sigma = 8.0e4  # resitivity
+    # rho_0 = 1.2
+    # alpha_h = 1.2  # tortuosity
+    # c_0 = 340.0
     
     # laine de roche (source : https://scispace.com/pdf/characterizing-modelling-and-optimizing-the-sound-absorption-1p9oyra5mr.pdf)
     #phi = 0.94  # porosity
@@ -272,7 +272,7 @@ def run_plot_alpha(material):
 
 
 def run():
-    material = 'LAINE DE VERRE'
+    material = 'MOUSSE DE MELAMINE'
     run_compute_alpha(material)
     run_plot_alpha(material)
     return
