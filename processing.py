@@ -423,7 +423,48 @@ def solve_helmholtz(domain, space_step, omega,
 
     return u
 
+def solve_adjoint(domain, space_step, omega, u,
+                    beta_pde, alpha_pde, alpha_dir, beta_neu, beta_rob, alpha_rob):
+    """
+    Résout le problème adjoint : -div(h*grad(p)) - w^2*p = -j'(u)
+    Ici, j(u) = |u|^2, donc j'(u) = 2*u
+    """
+    (M, N) = numpy.shape(domain)
+    
+    # 1. --- Définir le second membre (la "source" du problème adjoint) ---
+    # f_adjoint = -j'(u) = -2*u.
+    f = -2.0 * u 
+    # Les conditions aux limites adjointes sont homogènes
+    f_dir = numpy.zeros((M, N), dtype=numpy.complex128)
+    f_neu = numpy.zeros((M, N), dtype=numpy.complex128)
+    f_rob = numpy.zeros((M, N), dtype=numpy.complex128)
+    
+    # --- Créer la matrice de rigidité
+    mat_temp, rhs_temp = compute_stiffness_matrix(domain, space_step, f, beta_pde)
+    mat = mat_temp
+    rhs = rhs_temp
+    # --- Créer la matrice de masse
+    mat_temp, rhs_temp = compute_mass_matrix(domain, space_step, alpha_pde)
+    mat = mat + omega ** 2 * mat_temp
+    rhs = rhs
+    
+    # 2. --- Appliquer les conditions aux limites (homogènes) ---
+    mat, rhs = compute_dirichlet_condition(domain, f_dir, alpha_dir, beta_pde, mat, rhs)
+    mat, rhs = compute_neumann_condition(domain, space_step, f_neu, beta_neu, beta_pde, mat, rhs)
+    mat, rhs = compute_robin_condition(domain, space_step, f_rob, alpha_rob, beta_rob, beta_pde, mat, rhs)
 
+    # --- Résoudre le système linéaire
+    sol = scipy.sparse.linalg.spsolve(mat, rhs)
+
+    p = numpy.zeros((M, N), dtype=numpy.complex128)
+    
+    for i in range(0, M):
+        for j in range(0, N):
+            row = i * N + j
+            if is_in_interior_domain(domain[i, j]):
+                p[i, j] = sol[row]
+
+    return p
 def compute_robin_condition_down(domain, u, space_step, beta_rob, alpha_rob):
     """
 
